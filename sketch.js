@@ -142,38 +142,36 @@ function draw() {
   text("Random level: walls + obstacles + words", 10, 34); // /
 }
 
-// / NEW: builds a new level by overwriting grid contents (same grid size) // /
+// / NEW: builds a new level WITHOUT deleting the maze // /
 function generateNewLevel() {
   // /
-  const rows = grid.length; // / number of rows // /
-  const cols = grid[0].length; // / number of columns // /
+  const rows = grid.length; // /
+  const cols = grid[0].length; // /
 
-  // / STEP 1: fill everything with floor (0) using nested loops // /
+  // / STEP 1: restore the original maze from BASE_GRID (so maze stays!) // /
   for (let r = 0; r < rows; r++) {
     // /
     for (let c = 0; c < cols; c++) {
       // /
-      grid[r][c] = 0; // / set to floor // /
+      grid[r][c] = BASE_GRID[r][c]; // / copy cell back (0 floor, 1 wall) // /
     } // /
   } // /
 
-  // / STEP 2: border walls (top, bottom, left, right) // /
+  // / STEP 2: enforce border walls (fixes any accidental border issues) // /
   for (let c = 0; c < cols; c++) {
     // /
-    grid[0][c] = 1; // / top row wall // /
-    grid[rows - 1][c] = 1; // / bottom row wall // /
+    grid[0][c] = 1; // /
+    grid[rows - 1][c] = 1; // /
   } // /
   for (let r = 0; r < rows; r++) {
     // /
-    grid[r][0] = 1; // / left column wall // /
-    grid[r][cols - 1] = 1; // / right column wall // /
+    grid[r][0] = 1; // /
+    grid[r][cols - 1] = 1; // /
   } // /
 
-  // / STEP 3: place random obstacles (2) in empty floor cells // /
-  placeRandomTiles(NUM_OBSTACLES, () => 2); // / passes a function that returns "2" // /
-
-  // / STEP 4: place random word tiles (strings) in empty floor cells // /
-  placeRandomTiles(NUM_WORDS, () => random(WORD_LIST)); // / picks a random word // /
+  // / STEP 3: place obstacles + words ONLY on floors (0) so walls stay intact // /
+  placeRandomTiles(NUM_OBSTACLES, () => 2); // / 2 = obstacle // /
+  placeRandomTiles(NUM_WORDS, () => random(WORD_LIST)); // / string word tile // /
 } // /
 
 // / NEW: helper to place N tiles in random empty spots // /
