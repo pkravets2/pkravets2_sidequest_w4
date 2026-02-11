@@ -147,9 +147,9 @@ function drawHUD() {
   textSize(14);
 
   // / FIX: move text down and add spacing // /
-  text("Static array → grid render", 10, height - 55);
-  text("Random add-ons: obstacles + words", 10, height - 35);
-  text("Press R to reroll", 10, height - 15);
+  text("Static array → grid render", 10, 12); // was 8
+  text("Random add-ons: obstacles + words", 10, 32); // was 26
+  text("Press R to reroll", 10, 52); // was 44 (may be too low if HUD_H is 56)
 
   pop();
 }
