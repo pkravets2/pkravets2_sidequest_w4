@@ -13,6 +13,10 @@ PURPOSE: This is the simplest possible p5.js sketch that demonstrates:
 
 const TS = 32; // TILE SIZE: pixels per grid cell (32x32 squares)
 
+const HUD_H = 56; // / NEW: reserved space at top for HUD text (pixels) // /
+text("Static array → grid render", 10, 8); // / stays in HUD // /
+text("Random level: walls + obstacles + words", 10, 26); // / stays in HUD // /
+
 // / NEW: word list + counts (edit these to customize) // /
 const WORD_LIST = ["GO", "HI", "KEY", "EXIT"]; // / words to place // /
 const NUM_OBSTACLES = 12; // / fewer looks nicer in this maze; change if you want // /
@@ -68,7 +72,7 @@ const BASE_GRID = grid.map((row) => row.slice()); // / copies each row // /
 p5.js SETUP: Runs once when sketch loads
 */
 function setup() {
-  createCanvas(grid[0].length * TS, grid.length * TS);
+  createCanvas(grid[0].length * TS, grid.length * TS + HUD_H); // / NEW: taller canvas for HUD // /
 
   noStroke();
   textFont("sans-serif");
@@ -107,22 +111,22 @@ function drawGrid() {
       } else {
         fill(230); // floor
       }
-      rect(c * TS, r * TS, TS, TS);
+      rect(c * TS, HUD_H + r * TS, TS, TS); // / NEW: move grid down by HUD_H // /
 
       // Obstacle overlay
       if (grid[r][c] === 2) {
         fill(90);
-        rect(c * TS + 6, r * TS + 6, TS - 12, TS - 12);
+        rect(c * TS + 6, HUD_H + r * TS + 6, TS - 12, TS - 12); // / NEW: add HUD_H // /
       }
 
       // Word tile overlay
       if (typeof grid[r][c] === "string") {
         fill(250);
-        rect(c * TS + 2, r * TS + 2, TS - 4, TS - 4);
+        rect(c * TS + 2, HUD_H + r * TS + 2, TS - 4, TS - 4); // / NEW: add HUD_H // /
 
         // / FIX: draw the word in the exact middle of the tile // /
         fill(0);
-        text(grid[r][c], c * TS + TS / 2, r * TS + TS / 2);
+        text(grid[r][c], c * TS + TS / 2, HUD_H + r * TS + TS / 2); // / NEW: add HUD_H // /
       }
     }
   }
