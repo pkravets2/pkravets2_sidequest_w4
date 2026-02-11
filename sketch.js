@@ -141,19 +141,17 @@ function drawGrid() {
 
 // / NEW: HUD (kept separate so it won’t mess with tile text alignment) // /
 function drawHUD() {
-  push(); // /
+  push();
   fill(0);
   textAlign(LEFT, TOP);
   textSize(14);
 
-  // / FIX: place HUD inside the top-left but not too low; you can move it easily // /
-  text("Static array → grid render", 10, 8);
-  text("Random add-ons: obstacles + words", 10, 26);
+  // / FIX: move text down and add spacing // /
+  text("Static array → grid render", 10, 12); // was 8
+  text("Random add-ons: obstacles + words", 10, 32); // was 26
+  text("Press R to reroll", 10, 52); // was 44 (may be too low if HUD_H is 56)
 
-  // / OPTIONAL: hint for rerolling // /
-  text("Press R to reroll", 10, 44);
-
-  pop(); // /
+  pop();
 }
 
 // / NEW: builds a new level WITHOUT deleting the maze // /
