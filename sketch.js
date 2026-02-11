@@ -87,16 +87,16 @@ p5.js DRAW: Runs 60 times per second (game loop)
 function draw() {
   background(240);
 
-  // / NEW: draw the grid first // /
-  drawGrid(); // /
+  drawGrid();
 
-  // / NEW: draw HUD last so it’s not affecting tile text alignment // /
-  drawHUD(); // /
-  // / OPTIONAL FINAL FIX: draw a HUD panel so text is readable // /
+  // / OPTIONAL FINAL FIX: HUD panel first (behind the text) // /
   push();
-  fill(240); // light gray panel
+  fill(240); // you can try 250 or 220 for more contrast
   rect(0, 0, width, HUD_H);
   pop();
+
+  // then draw the HUD text on top of the panel
+  drawHUD();
 }
 
 // / NEW: draws the whole level (tiles + obstacles + word tiles) // /
