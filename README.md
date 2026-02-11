@@ -1,18 +1,18 @@
 ## Project Title
 
-GBDA302 Week 4 Example 1: Grid + Static Maze
+Grid + Static Maze
 
 ---
 
 ## Authors
 
-Karen Cochrane and David Han
+Peter Kravets, pkravets, 21101536
 
 ---
 
 ## Description
 
-This sketch demonstrates how a 2D array represents a maze/game level.
+This sketch demonstrates how a 2D array represents a maze/game level. It also adds random obstacles and word tiles each run.
 
 ---
 
@@ -20,9 +20,10 @@ This sketch demonstrates how a 2D array represents a maze/game level.
 
 Learning Goals:
 
-- Nested loops to iterate through grid rows/columns
-- Converting grid coordinates (r,c) → screen coordinates (x,y)
-- Tile-based rendering (every cell = one rectangle)
+- Nested loops to draw a 2d grid.
+- Converting grid coordinates (r,c) → into pixel positions.
+- Render a tile map using rect() and text()
+- Use arrays to generate small random level changes.
 
 ---
 
@@ -34,6 +35,8 @@ N/A
 
 ## GenAI
 
-The code was written by Dr. Karen Cochrane and David Han but they used GenAI to write the comments.
+I used GenAI to help me work on the provided code.
+It helped me add features like random obstacles word tiles and a HUD area.
+It also helped me debug layout issues
 
 ---
