@@ -13,6 +13,11 @@ PURPOSE: This is the simplest possible p5.js sketch that demonstrates:
 
 const TS = 32; // TILE SIZE: pixels per grid cell (32x32 squares)
 
+// / NEW: word list + counts (edit these to customize) // /
+const WORD_LIST = ["GO", "HI", "KEY", "EXIT"]; // / simple words to place // /
+const NUM_OBSTACLES = 18; // / how many obstacles to try placing // /
+const NUM_WORDS = 6; // / how many word tiles to try placing // /
+
 /*
 GRID LEGEND (how numbers map to visuals):
 - 0 = floor (walkable, light gray)
@@ -66,6 +71,12 @@ function setup() {
   noStroke(); // No black outlines on tiles (clean look)
   textFont("sans-serif"); // Clean font for UI text
   textSize(14); // Small text size for HUD
+
+  // / NEW: makes word text easier to center in tiles // /
+  textAlign(CENTER, CENTER); // / centers text at (x,y) you give it // /
+
+  // / NEW: generate a fresh level EACH run by overwriting values inside grid // /
+  generateNewLevel(); // / this edits grid in place (grid stays same size) // /
 }
 
 /*
@@ -100,10 +111,91 @@ function draw() {
       - x = column × TS    y = row × TS
       */
       rect(c * TS, r * TS, TS, TS);
+
+      // / NEW: draw obstacles ON TOP of floor (without changing your wall/floor logic) // /
+      if (grid[r][c] === 2) {
+        // / obstacle tile check // /
+        fill(90); // / darker gray for obstacle // /
+        rect(c * TS + 6, r * TS + 6, TS - 12, TS - 12); // / smaller block inside tile // /
+      }
+
+      // / NEW: draw word tiles if the grid cell stores a string like "GO" // /
+      if (typeof grid[r][c] === "string") {
+        // / word tile check // /
+        fill(250); // / light label background // /
+        rect(c * TS + 2, r * TS + 2, TS - 4, TS - 4); // / inset rect so it pops // /
+        fill(0); // / black text // /
+        text(grid[r][c], c * TS + TS / 2, r * TS + TS / 2); // / centered word // /
+      }
     }
   }
 
   // UI LABEL: Explain what students are seeing
   fill(0); // Black text
+
+  // / NEW: switch alignment back for HUD text so it behaves like normal labels // /
+  textAlign(LEFT, BASELINE); // / affects HUD text only (below) // /
+
   text("Static array → grid render", 10, 16);
+
+  // / NEW: optional extra HUD line so you can confirm generation happened // /
+  text("Random level: walls + obstacles + words", 10, 34); // /
 }
+
+// / NEW: builds a new level by overwriting grid contents (same grid size) // /
+function generateNewLevel() {
+  // /
+  const rows = grid.length; // / number of rows // /
+  const cols = grid[0].length; // / number of columns // /
+
+  // / STEP 1: fill everything with floor (0) using nested loops // /
+  for (let r = 0; r < rows; r++) {
+    // /
+    for (let c = 0; c < cols; c++) {
+      // /
+      grid[r][c] = 0; // / set to floor // /
+    } // /
+  } // /
+
+  // / STEP 2: border walls (top, bottom, left, right) // /
+  for (let c = 0; c < cols; c++) {
+    // /
+    grid[0][c] = 1; // / top row wall // /
+    grid[rows - 1][c] = 1; // / bottom row wall // /
+  } // /
+  for (let r = 0; r < rows; r++) {
+    // /
+    grid[r][0] = 1; // / left column wall // /
+    grid[r][cols - 1] = 1; // / right column wall // /
+  } // /
+
+  // / STEP 3: place random obstacles (2) in empty floor cells // /
+  placeRandomTiles(NUM_OBSTACLES, () => 2); // / passes a function that returns "2" // /
+
+  // / STEP 4: place random word tiles (strings) in empty floor cells // /
+  placeRandomTiles(NUM_WORDS, () => random(WORD_LIST)); // / picks a random word // /
+} // /
+
+// / NEW: helper to place N tiles in random empty spots // /
+function placeRandomTiles(count, makeTileValue) {
+  // /
+  let placed = 0; // / how many successfully placed // /
+  let tries = 0; // / safety counter to prevent infinite loops // /
+  const maxTries = 5000; // / increase if your grid is bigger // /
+
+  while (placed < count && tries < maxTries) {
+    // /
+    tries++; // /
+
+    // / pick a random interior cell (avoid borders so we don't overwrite walls) // /
+    const r = floor(random(1, grid.length - 1)); // /
+    const c = floor(random(1, grid[0].length - 1)); // /
+
+    // / only place on empty floor // /
+    if (grid[r][c] === 0) {
+      // /
+      grid[r][c] = makeTileValue(); // / obstacle (2) or word ("GO") // /
+      placed++; // /
+    } // /
+  } // /
+} // /
