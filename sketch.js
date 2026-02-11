@@ -14,8 +14,10 @@ PURPOSE: This is the simplest possible p5.js sketch that demonstrates:
 const TS = 32; // TILE SIZE: pixels per grid cell (32x32 squares)
 
 const HUD_H = 56; // / NEW: reserved space at top for HUD text (pixels) // /
-text("Static array → grid render", 10, 8); // / stays in HUD // /
-text("Random level: walls + obstacles + words", 10, 26); // / stays in HUD // /
+
+// / FIX: REMOVED these lines because text() cannot run outside draw()/setup() // /
+// text("Static array → grid render", 10, 8);
+// text("Random level: walls + obstacles + words", 10, 26);
 
 // / NEW: word list + counts (edit these to customize) // /
 const WORD_LIST = ["GO", "HI", "KEY", "EXIT"]; // / words to place // /
@@ -89,9 +91,9 @@ function draw() {
 
   drawGrid();
 
-  // / OPTIONAL FINAL FIX: HUD panel first (behind the text) // /
+  // / FIX: HUD panel at top, same color as walls so it blends with the blue border // /
   push();
-  fill(240); // you can try 250 or 220 for more contrast
+  fill(30, 50, 60); // / same as wall color // /
   rect(0, 0, width, HUD_H);
   pop();
 
@@ -106,7 +108,7 @@ function drawGrid() {
 
   // / FIX: tile text should be centered, always // /
   textAlign(CENTER, CENTER); // /
-  textSize(TS * 0.45); // / FIX: bigger than 14, but still fits in a 32px tile // /
+  textSize(TS * 0.45); // / fits inside a 32px tile // /
 
   for (let r = 0; r < grid.length; r++) {
     for (let c = 0; c < grid[0].length; c++) {
@@ -116,22 +118,21 @@ function drawGrid() {
       } else {
         fill(230); // floor
       }
-      rect(c * TS, HUD_H + r * TS, TS, TS); // / NEW: move grid down by HUD_H // /
+      rect(c * TS, HUD_H + r * TS, TS, TS);
 
       // Obstacle overlay
       if (grid[r][c] === 2) {
         fill(90);
-        rect(c * TS + 6, HUD_H + r * TS + 6, TS - 12, TS - 12); // / NEW: add HUD_H // /
+        rect(c * TS + 6, HUD_H + r * TS + 6, TS - 12, TS - 12);
       }
 
       // Word tile overlay
       if (typeof grid[r][c] === "string") {
         fill(250);
-        rect(c * TS + 2, HUD_H + r * TS + 2, TS - 4, TS - 4); // / NEW: add HUD_H // /
+        rect(c * TS + 2, HUD_H + r * TS + 2, TS - 4, TS - 4);
 
-        // / FIX: draw the word in the exact middle of the tile // /
         fill(0);
-        text(grid[r][c], c * TS + TS / 2, HUD_H + r * TS + TS / 2); // / NEW: add HUD_H // /
+        text(grid[r][c], c * TS + TS / 2, HUD_H + r * TS + TS / 2);
       }
     }
   }
@@ -139,17 +140,17 @@ function drawGrid() {
   pop(); // /
 }
 
-// / NEW: HUD (kept separate so it won’t mess with tile text alignment) // /
+// / FIXED: HUD is now drawn inside the top HUD bar, readable (white text) // /
 function drawHUD() {
   push();
-  fill(0);
+
+  fill(255); // / white text on blue bar // /
   textAlign(LEFT, TOP);
   textSize(14);
 
-  // / FIX: move text down and add spacing // /
-  text("Static array → grid render", 10, height - 55);
-  text("Random add-ons: obstacles + words", 10, height - 35);
-  text("Press R to reroll", 10, height - 15);
+  text("Static array → grid render", 10, 8);
+  text("Random add-ons: obstacles + words", 10, 26);
+  text("Press R to reroll", 10, 44);
 
   pop();
 }
@@ -159,14 +160,14 @@ function generateNewLevel() {
   const rows = grid.length;
   const cols = grid[0].length;
 
-  // / FIX (BIG): restore the original maze layout first // /
+  // restore the original maze layout first
   for (let r = 0; r < rows; r++) {
     for (let c = 0; c < cols; c++) {
-      grid[r][c] = BASE_GRID[r][c]; // keep maze walls/floors
+      grid[r][c] = BASE_GRID[r][c];
     }
   }
 
-  // / EXTRA SAFETY: enforce border walls (your base already has them) // /
+  // enforce border walls
   for (let c = 0; c < cols; c++) {
     grid[0][c] = 1;
     grid[rows - 1][c] = 1;
@@ -181,7 +182,7 @@ function generateNewLevel() {
   placeRandomTiles(NUM_WORDS, () => random(WORD_LIST));
 }
 
-// / NEW: helper to place N tiles in random empty floor spots // /
+// helper to place N tiles in random empty floor spots
 function placeRandomTiles(count, makeTileValue) {
   let placed = 0;
   let tries = 0;
@@ -190,11 +191,9 @@ function placeRandomTiles(count, makeTileValue) {
   while (placed < count && tries < maxTries) {
     tries++;
 
-    // random interior cell (avoid borders)
     const r = floor(random(1, grid.length - 1));
     const c = floor(random(1, grid[0].length - 1));
 
-    // only place on floor (0) so we don’t overwrite walls, obstacles, or words
     if (grid[r][c] === 0) {
       grid[r][c] = makeTileValue();
       placed++;
@@ -202,7 +201,7 @@ function placeRandomTiles(count, makeTileValue) {
   }
 }
 
-// / NEW: press R to generate a new level while running // /
+// press R to generate a new level while running
 function keyPressed() {
   if (key === "r" || key === "R") {
     generateNewLevel();
