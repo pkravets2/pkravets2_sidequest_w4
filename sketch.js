@@ -92,6 +92,11 @@ function draw() {
 
   // / NEW: draw HUD last so it’s not affecting tile text alignment // /
   drawHUD(); // /
+  // / OPTIONAL FINAL FIX: draw a HUD panel so text is readable // /
+  push();
+  fill(240); // light gray panel
+  rect(0, 0, width, HUD_H);
+  pop();
 }
 
 // / NEW: draws the whole level (tiles + obstacles + word tiles) // /
