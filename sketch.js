@@ -58,6 +58,10 @@ const grid = [
   [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
 ];
 
+// / FIX: you referenced BASE_GRID but didn’t define it in your pasted code // /
+// / This stores a copy of your original maze so we can restore it each run // /
+const BASE_GRID = grid.map((row) => row.slice()); // / FIX // /
+
 /*
 p5.js SETUP: Runs once when sketch loads
 */
@@ -86,6 +90,9 @@ function draw() {
   // Clear screen with light gray background each frame
   background(240);
 
+  // / FIX: ensure tiles/words always use centered alignment each frame // /
+  textAlign(CENTER, CENTER); // / FIX // /
+
   /*
   CORE RENDERING LOOP: Draw every tile in the grid
   
@@ -104,96 +111,78 @@ function draw() {
         fill(230);
       }
 
-      /*
-      CONVERT GRID COORDS → SCREEN COORDS:
-      - Grid: r=0,c=3     → Screen: x=96, y=0
-      - Grid: r=5,c=7     → Screen: x=224, y=160
-      - x = column × TS    y = row × TS
-      */
       rect(c * TS, r * TS, TS, TS);
 
       // / NEW: draw obstacles ON TOP of floor (without changing your wall/floor logic) // /
       if (grid[r][c] === 2) {
-        // / obstacle tile check // /
-        fill(90); // / darker gray for obstacle // /
-        rect(c * TS + 6, r * TS + 6, TS - 12, TS - 12); // / smaller block inside tile // /
+        fill(90);
+        rect(c * TS + 6, r * TS + 6, TS - 12, TS - 12);
       }
 
       // / NEW: draw word tiles if the grid cell stores a string like "GO" // /
       if (typeof grid[r][c] === "string") {
-        // / word tile check // /
-        fill(250); // / light label background // /
-        rect(c * TS + 2, r * TS + 2, TS - 4, TS - 4); // / inset rect so it pops // /
-        fill(0); // / black text // /
-        text(grid[r][c], c * TS + TS / 2, r * TS + TS / 2); // / centered word // /
+        fill(250);
+        rect(c * TS + 2, r * TS + 2, TS - 4, TS - 4);
+        fill(0);
+
+        // / FIX: nudge text slightly down so it looks visually centered (optional) // /
+        text(grid[r][c], c * TS + TS / 2, r * TS + TS / 2 + 1); // / FIX // /
       }
     }
   }
 
   // UI LABEL: Explain what students are seeing
-  fill(0); // Black text
+  fill(0);
 
   // / NEW: switch alignment back for HUD text so it behaves like normal labels // /
-  textAlign(LEFT, BASELINE); // / affects HUD text only (below) // /
+  textAlign(LEFT, TOP); // / FIX: TOP is more predictable than BASELINE // /
 
-  text("Static array → grid render", 10, 16);
-
-  // / NEW: optional extra HUD line so you can confirm generation happened // /
-  text("Random level: walls + obstacles + words", 10, 34); // /
+  text("Static array → grid render", 10, 10);
+  text("Random level: walls + obstacles + words", 10, 28);
 }
 
 // / NEW: builds a new level WITHOUT deleting the maze // /
 function generateNewLevel() {
-  // /
-  const rows = grid.length; // /
-  const cols = grid[0].length; // /
+  const rows = grid.length;
+  const cols = grid[0].length;
 
   // / STEP 1: restore the original maze from BASE_GRID (so maze stays!) // /
   for (let r = 0; r < rows; r++) {
-    // /
     for (let c = 0; c < cols; c++) {
-      // /
-      grid[r][c] = BASE_GRID[r][c]; // / copy cell back (0 floor, 1 wall) // /
-    } // /
-  } // /
+      grid[r][c] = BASE_GRID[r][c];
+    }
+  }
 
   // / STEP 2: enforce border walls (fixes any accidental border issues) // /
   for (let c = 0; c < cols; c++) {
-    // /
-    grid[0][c] = 1; // /
-    grid[rows - 1][c] = 1; // /
-  } // /
+    grid[0][c] = 1;
+    grid[rows - 1][c] = 1;
+  }
   for (let r = 0; r < rows; r++) {
-    // /
-    grid[r][0] = 1; // /
-    grid[r][cols - 1] = 1; // /
-  } // /
+    grid[r][0] = 1;
+    grid[r][cols - 1] = 1;
+  }
 
   // / STEP 3: place obstacles + words ONLY on floors (0) so walls stay intact // /
-  placeRandomTiles(NUM_OBSTACLES, () => 2); // / 2 = obstacle // /
-  placeRandomTiles(NUM_WORDS, () => random(WORD_LIST)); // / string word tile // /
-} // /
+  placeRandomTiles(NUM_OBSTACLES, () => 2);
+  placeRandomTiles(NUM_WORDS, () => random(WORD_LIST));
+}
 
 // / NEW: helper to place N tiles in random empty spots // /
 function placeRandomTiles(count, makeTileValue) {
-  // /
-  let placed = 0; // / how many successfully placed // /
-  let tries = 0; // / safety counter to prevent infinite loops // /
-  const maxTries = 5000; // / increase if your grid is bigger // /
+  let placed = 0;
+  let tries = 0;
+  const maxTries = 5000;
 
   while (placed < count && tries < maxTries) {
-    // /
-    tries++; // /
+    tries++;
 
-    // / pick a random interior cell (avoid borders so we don't overwrite walls) // /
-    const r = floor(random(1, grid.length - 1)); // /
-    const c = floor(random(1, grid[0].length - 1)); // /
+    const r = floor(random(1, grid.length - 1));
+    const c = floor(random(1, grid[0].length - 1));
 
-    // / only place on empty floor // /
     if (grid[r][c] === 0) {
-      // /
-      grid[r][c] = makeTileValue(); // / obstacle (2) or word ("GO") // /
-      placed++; // /
-    } // /
-  } // /
-} // /
+      grid[r][c] = makeTileValue();
+      placed++;
+    }
+  }
+}
