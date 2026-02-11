@@ -146,14 +146,14 @@ function drawGrid() {
 // / NEW: HUD (kept separate so it won’t mess with tile text alignment) // /
 function drawHUD() {
   push();
-  fill(0);
+  fill(0); // black text
   textAlign(LEFT, TOP);
   textSize(14);
 
-  // / FIX: move text down and add spacing // /
-  text("Static array → grid render", 10, height - 55);
-  text("Random add-ons: obstacles + words", 10, height - 35);
-  text("Press R to reroll", 10, height - 15);
+  // moved to the TOP inside the HUD area
+  text("Static array → grid render", 10, 8);
+  text("Random add-ons: obstacles + words", 10, 26);
+  text("Press R to reroll", 10, 44);
 
   pop();
 }
